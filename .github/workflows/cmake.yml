@@ -16,7 +16,7 @@ jobs:
     runs-on: ubuntu-20.04
 
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v4
       with:
         submodules: recursive
 
@@ -42,7 +42,7 @@ jobs:
       run: ./.github/scripts/package.sh Ubuntu-20.04-x64
 
     - name: Archive Artifacts
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v4
       with:
         name: Camomile-Ubuntu-20.04-x64
         path: Camomile-Ubuntu-20.04-x64.zip
@@ -59,7 +59,7 @@ jobs:
     runs-on: macos-latest
 
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v4
       with:
         submodules: recursive
 
@@ -82,7 +82,7 @@ jobs:
       run: ./.github/scripts/package.sh MacOS-Universal
 
     - name: Archive Artifacts
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v4
       with:
         name: Camomile-MacOS-Universal
         path: Camomile-MacOS-Universal.zip
@@ -99,7 +99,7 @@ jobs:
     runs-on: windows-2019
 
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v4
       with:
         submodules: recursive
 
@@ -122,7 +122,7 @@ jobs:
       run: ./.github/scripts/package.bat Win64
 
     - name: Archive Artifacts
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v4
       with:
         name: Camomile-Win64
         path: Camomile-Win64.zip
