@@ -101,8 +101,8 @@ m_processor(processor), m_window(new CamomileEditorWindow())
     m_center.setTransformToFit(juce::Rectangle<float>(0.f, 0.f, 18.f, 18.f), RectanglePlacement::stretchToFit);
     m_petals.setTransformToFit(juce::Rectangle<float>(0.f, 0.f, 18.f, 18.f), RectanglePlacement::stretchToFit);
     m_center.setAlwaysOnTop(true);
-    addAndMakeVisible(m_center, -1);
-    addAndMakeVisible(m_petals, 0);
+//    addAndMakeVisible(m_center, -1);
+//    addAndMakeVisible(m_petals, 0);
     m_petals.setOverlayColour(Colours::black);
     m_petals.setAlpha(0.5f);
     setBounds(3, 3, 18, 18);
@@ -121,6 +121,9 @@ void CamomileEditorButton::buttonStateChanged()
 }
 
 void CamomileEditorButton::clicked()
+{
+}
+void CamomileEditorButton::openWindow()
 {
     if(m_window->isVisible() && m_window->isShowing())
     {

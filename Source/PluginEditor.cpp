@@ -75,6 +75,11 @@ void CamomileEditor::resized()
 
 bool CamomileEditor::keyPressed(const KeyPress& key)
 {
+    if(key.isCurrentlyDown() && key.getKeyCode() == KeyPress::F12Key) {
+        // TODO cleaner solution
+        m_button.openWindow();
+        return true;
+    }
     return CamomileEditorKeyManager::keyPressed(key);
 }
 

@@ -22,6 +22,7 @@ public:
     void paintButton(Graphics& g, bool over, bool down) final {};
     void buttonStateChanged() final;
     void clicked() final;
+    void openWindow();
 private:
     CamomileAudioProcessor& m_processor;
     DrawableImage           m_center;
