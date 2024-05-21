@@ -135,6 +135,7 @@ public:
     void mouseDown(const MouseEvent& e) override;
     void mouseDrag(const MouseEvent& e) override;
     void mouseUp(const MouseEvent& e) override;
+    bool isKnob();
 private:
     bool m_shift = false;
     float m_temp = 0.f;

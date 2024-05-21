@@ -288,13 +288,16 @@ void GuiBang::mouseUp(const MouseEvent& e)
 void GuiToggle::paint(Graphics& g)
 {
     const float border = 1.f;
+    const float padding = 1.f;
     g.fillAll(Colour(static_cast<uint32>(gui.getBackgroundColor())));
     if(getValueOriginal() > std::numeric_limits<float>::epsilon())
     {
         const float w = static_cast<float>(getWidth()) - border * 2.f;
         g.setColour(Colour(static_cast<uint32>(gui.getForegroundColor())));
-        g.drawLine(1.f + border, 1.f + border, w, w, border);
-        g.drawLine(w, 1.f + border, 1.f + border, w, border);
+
+        g.fillRect(border + padding, border + padding, w - padding * 2.f, w - padding * 2.f);
+//        g.drawLine(1.f + border, 1.f + border, w, w, border);
+//        g.drawLine(w, 1.f + border, 1.f + border, w, border);
     }
     g.setColour(Colours::black);
     g.drawRect(getLocalBounds(), static_cast<int>(border));
@@ -396,20 +399,63 @@ void GuiSliderHorizontal::mouseUp(const MouseEvent& e)
 //////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////     SLIDER VERTICAL     /////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////
-    
+bool GuiSliderVertical::isKnob()
+{
+    return getWidth() == getHeight()-5; // FIXME PD slider size differs (probably inner size)
+}
 void GuiSliderVertical::paint(Graphics& g)
 {
+    const float val = gui.isLogScale() ? log(getValueOriginal() / min) / log(max / min) : getValueScaled();
     const float border = 1.f;
     const float w = static_cast<float>(getWidth() - border * 2);
     const float h = static_cast<float>(getHeight() - border * 2);
-    const float crsor = w;
-    const float val = gui.isLogScale() ? log(getValueOriginal() / min) / log(max / min) : getValueScaled();
-    const float pos = (1.f - val) * (h - crsor - border) + crsor / 2.f + border + 0.5f;
-    g.fillAll(Colour(static_cast<uint32>(gui.getBackgroundColor())));
-    g.setColour(Colour(static_cast<uint32>(gui.getForegroundColor())));
-    g.drawLine(border + 0.5f, pos, w + 0.5f, pos, crsor);
-    g.setColour(Colours::black);
-    g.drawRect(getLocalBounds(), static_cast<int>(border));
+    
+    // paint as knob
+    if(isKnob()) 
+    {
+        g.fillAll(Colours::transparentBlack);
+        
+        g.setColour(Colour(static_cast<uint32>(gui.getBackgroundColor())));
+        g.fillEllipse(border, border, w, w);
+    
+        g.setColour(Colours::black);
+        g.drawEllipse(border, border, w, w, border);
+
+        const float PI = atan(1.f) * 4.f;
+        const float thumb_s = w / 4.f;
+        
+        const float thumb_gap = 1.f;
+
+        const float angle_gap = 0.3f;
+        const float angle = PI / 2.f + PI * angle_gap / 2.f + (2.f - angle_gap) * PI * val;
+
+        const float distance = w / 2.f - thumb_s/2.f - thumb_gap - border;
+
+        const float c_x = cos(angle) * distance + w/2.f + border;
+        const float c_y = sin(angle) * distance + w/2.f + border;
+
+        const float thumb_x = c_x - thumb_s / 2.f;
+        const float thumb_y = c_y - thumb_s / 2.f;
+
+        g.setColour(Colour(static_cast<uint32>(gui.getForegroundColor())));
+        g.fillEllipse(thumb_x, thumb_y, thumb_s, thumb_s);
+    
+        g.setColour(Colours::black);
+        g.drawEllipse(thumb_x, thumb_y, thumb_s, thumb_s, border);
+
+    }
+    // paint as slider
+    else
+    {
+
+        const float crsor = w;
+        const float pos = (1.f - val) * (h - crsor - border) + crsor / 2.f + border + 0.5f;
+        g.fillAll(Colour(static_cast<uint32>(gui.getBackgroundColor())));
+        g.setColour(Colour(static_cast<uint32>(gui.getForegroundColor())));
+        g.drawLine(border + 0.5f, pos, w + 0.5f, pos, crsor);
+        g.setColour(Colours::black);
+        g.drawRect(getLocalBounds(), static_cast<int>(border));
+    }
 }
 
 void GuiSliderVertical::mouseDown(const MouseEvent& e)
@@ -445,21 +491,10 @@ void GuiSliderVertical::mouseDown(const MouseEvent& e)
 
 void GuiSliderVertical::mouseDrag(const MouseEvent& e)
 {
-    if(!m_shift && gui.jumpOnClick())
+    if(isKnob())
     {
-        const float val = static_cast<float>(getHeight() - e.y - 2) / static_cast<float>(getHeight() - 4);
-        if(gui.isLogScale())
-        {
-            setValueOriginal(exp(val * log(max /min)) * min);
-        }
-        else
-        {
-            setValueScaled(val);
-        }
-    }
-    else
-    {
-        const float val = static_cast<float>(e.getMouseDownY() - e.y) / static_cast<float>(getHeight() - 7) * (m_shift ? 0.01f : 1.0f);
+        const float speed = 1.f / 150.f;
+        const float val = static_cast<float>(e.getMouseDownY() - e.y) * speed * (m_shift ? 0.1f : 1.0f);
         if(gui.isLogScale())
         {
             setValueOriginal(exp((m_temp + val) * log(max / min)) * min);
@@ -467,6 +502,33 @@ void GuiSliderVertical::mouseDrag(const MouseEvent& e)
         else
         {
             setValueScaled(m_temp + val);
+        }
+    }
+    else
+    {
+        if(!m_shift && gui.jumpOnClick())
+        {
+            const float val = static_cast<float>(getHeight() - e.y - 2) / static_cast<float>(getHeight() - 4);
+            if(gui.isLogScale())
+            {
+                setValueOriginal(exp(val * log(max /min)) * min);
+            }
+            else
+            {
+                setValueScaled(val);
+            }
+        }
+        else
+        {
+            const float val = static_cast<float>(e.getMouseDownY() - e.y) / static_cast<float>(getHeight() - 7) * (m_shift ? 0.01f : 1.0f);
+            if(gui.isLogScale())
+            {
+                setValueOriginal(exp((m_temp + val) * log(max / min)) * min);
+            }
+            else
+            {
+                setValueScaled(m_temp + val);
+            }
         }
     }
     repaint();
@@ -670,9 +732,9 @@ void GuiNumber::paint(Graphics& g)
     p.closeSubPath();
     g.setColour(juce::Colour(static_cast<uint32>(gui.getBackgroundColor())));
     g.fillPath(p);
-    g.setColour(juce::Colour(static_cast<uint32>(gui.getForegroundColor())));
-    g.drawLine(0.f, 0.f, h * 0.5f, h * 0.5f, border);
-    g.drawLine(0.f, h, h * 0.5f, h * 0.5f, border);
+//    g.setColour(juce::Colour(static_cast<uint32>(gui.getForegroundColor())));
+//    g.drawLine(0.f, 0.f, h * 0.5f, h * 0.5f, border);
+//    g.drawLine(0.f, h, h * 0.5f, h * 0.5f, border);
     g.setColour(juce::Colours::black);
     g.strokePath(p, juce::PathStrokeType(border));
 }
