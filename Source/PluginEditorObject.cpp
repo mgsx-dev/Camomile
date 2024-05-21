@@ -315,11 +315,12 @@ void GuiToggle::mouseDown(const MouseEvent& e)
 void GuiSliderHorizontal::paint(Graphics& g)
 {
     const float border = 1.f;
-    const float crsor  = 3.f;
     const float w = static_cast<float>(getWidth()) - border * 2.f;
     const float h = static_cast<float>(getHeight()) - border * 2.f;
+    const float crsor  = h;
+
     const float val = gui.isLogScale() ? log(getValueOriginal() / min) / log(max / min) : getValueScaled();
-    const float pos = val * (w - crsor - border) + crsor;
+    const float pos = val * (w - crsor - border) + crsor / 2.f + border + 0.5f;
     g.fillAll(Colour(static_cast<uint32>(gui.getBackgroundColor())));
     g.setColour(Colour(static_cast<uint32>(gui.getForegroundColor())));
     g.drawLine(pos, border + 0.5f, pos, h + 0.5f, crsor);
@@ -399,11 +400,11 @@ void GuiSliderHorizontal::mouseUp(const MouseEvent& e)
 void GuiSliderVertical::paint(Graphics& g)
 {
     const float border = 1.f;
-    const float crsor = 3.f;
     const float w = static_cast<float>(getWidth() - border * 2);
     const float h = static_cast<float>(getHeight() - border * 2);
+    const float crsor = w;
     const float val = gui.isLogScale() ? log(getValueOriginal() / min) / log(max / min) : getValueScaled();
-    const float pos = (1.f - val) * (h - crsor - border) + crsor;
+    const float pos = (1.f - val) * (h - crsor - border) + crsor / 2.f + border + 0.5f;
     g.fillAll(Colour(static_cast<uint32>(gui.getBackgroundColor())));
     g.setColour(Colour(static_cast<uint32>(gui.getForegroundColor())));
     g.drawLine(border + 0.5f, pos, w + 0.5f, pos, crsor);
