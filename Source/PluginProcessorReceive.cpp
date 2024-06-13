@@ -249,6 +249,10 @@ void CamomileAudioProcessor::parseProgram(const std::vector<pd::Atom>& list)
 {
     if(list.size() >= 1 && list[0].isSymbol() && list[0].getSymbol() == "updated")
     {
+        // Juce latest
+        //updateHostDisplay(AudioProcessorListener::ChangeDetails::getDefaultFlags().withNonParameterStateChanged(true));
+        // Juce current
+        // updateHostDisplay(AudioProcessorListener::ChangeDetails().withProgramChanged (true));
         updateHostDisplay();
     }
     else
